@@ -4,14 +4,17 @@ Plugin Name: GA Authors
 Plugin Script: ga-authors.php
 Plugin URI: http://marto.lazarov.org/plugins/ga-authors
 Description: Track page views by authors
-Version: 1.0.1
+Version: 1.0.2
 Author: mlazarov
 Author URI: http://marto.lazarov.org
 Min WP Version: 2.7
-Max WP Version: 3.1.2
+Max WP Version: 3.2.1
 Update Server: http://marto.lazarov.org/plugins/ga-authors
 
 == Changelog ==
+= 1.0.2 =
+* Updated install howto
+* Bugfixes
 
 = 1.0.1 =
 * Bugfix
@@ -70,28 +73,31 @@ if (!class_exists('ga_authors')) {
 		}
 		
 		function Footer(){
-			if($this->options['ga_code']){
-			?>
+                        global $posts;
+                        if($this->options['ga_code']){
+                        ?>
 
 <script type="text/javascript">
-	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', '<?=$this->options['ga_code'];?>']);
-	_gaq.push(['_trackPageview']);<?php 
+// GA authors tracker
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', '<?=$this->options['ga_code'];?>']);
+        _gaq.push(['_trackPageview']);<?php
             if (is_single()){
-            if (have_posts()) the_post();
-        	?>
+                 $authorID = $posts[0]->post_author;
+                ?>
 
-	_gaq.push(['_trackPageview', '/by-author/<?=the_author_meta('display_name');?>']);<?php }?>
+        _gaq.push(['_trackPageview', '/by-author/<?php the_author_meta('display_name',$authorID);?>']);// <?php the_author_meta('ID',$authorID);?>
+        <?php }?>
 
-	(function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	})();
+        (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+// End GA authors tracker
 </script>
-<?php
-			}
-		}
+<?php }
+                }
 
 		// -----------------------------------------------------------------------------------------------------------	
 		/**
@@ -129,6 +135,6 @@ if (!class_exists('ga_authors')) {
 }
 
 if (class_exists('ga_authors')) {
-	$wp_delete_posts_var = new ga_authors();
+	$wp_ga_authors_var = new ga_authors();
 }
 ?>
